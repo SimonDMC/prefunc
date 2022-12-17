@@ -1,5 +1,4 @@
 import fs from "fs";
-import chalk from "chalk";
 import config from "./config.json" assert { type: "json" };
 import { getAllNestedFiles, wipeDirectory, copyFile } from "./fileUtils.js";
 import { parseGlobals, parseFile } from "./parser.js";
@@ -40,6 +39,7 @@ directories.forEach((dir) => {
         if (!config.fileExtensions.includes(file.split(".").pop())) {
             const destination = file.replace("~", "");
             copyFile(file, destination);
+            return;
         }
 
         // if it's a working file, parse it

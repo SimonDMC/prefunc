@@ -29,14 +29,26 @@ export function getAllNestedFiles(dirPath, arrayOfFiles) {
 /**
  * Wipes a directory
  * @param {string} dirPath Path to the directory
- * @returns {void}
  */
 export function wipeDirectory(dirPath) {
     try {
         fs.rmSync(dirPath, { recursive: true });
-        console.log(chalk.green("Wiped directory: " + dirPath));
     } catch (e) {
         console.log(chalk.yellow("Skipping directory wipe: " + dirPath));
+    }
+}
+
+/**
+ * Ensures that the parent directory of a file exists
+ * @param {string} path Path to the file
+ */
+function ensureParent(path) {
+    try {
+        fs.mkdirSync(path.split("/").slice(0, -1).join("/"), {
+            recursive: true,
+        });
+    } catch (e) {
+        console.log(e);
     }
 }
 
@@ -44,20 +56,29 @@ export function wipeDirectory(dirPath) {
  * Copies a file
  * @param {string} source Path to the source file
  * @param {string} target Path to the target file
- * @returns {void}
  */
 export function copyFile(source, target) {
-    try {
-        fs.mkdirSync(target.split("/").slice(0, -1).join("/"));
-    } catch (e) {
-        console.log(e);
-    }
-
+    ensureParent(target);
     try {
         fs.copyFileSync(source, target);
     } catch (e) {
         console.log(
             chalk.red("Error copying file: " + source + " to " + target)
         );
+    }
+}
+
+/**
+ * Creates a file
+ * @param {string} path Path to the file
+ * @param {string} content Content of the file
+ */
+export function createFile(path, content) {
+    ensureParent(path);
+    try {
+        fs.writeFileSync(path, content);
+    } catch (e) {
+        console.error(chalk.red("Error creating file: " + path));
+        console.log(e);
     }
 }

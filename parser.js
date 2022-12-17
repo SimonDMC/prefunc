@@ -1,4 +1,6 @@
 import chalk from "chalk";
+import fs from "fs";
+import { createFile } from "./fileUtils.js";
 
 /**
  * Lists all global variables in a file
@@ -42,7 +44,6 @@ export function parseGlobals(lines, file) {
  * Parses a file and does all the necessary replacements
  * @param {string} file File path
  * @param {object} globals Object containing all global variables
- * @returns {void}
  */
 export function parseFile(file, globals) {
     // read the file and split into lines
@@ -50,6 +51,9 @@ export function parseFile(file, globals) {
     const lines = fileContents.split("\n");
 
     const variables = {};
+    const newLines = JSON.parse(JSON.stringify(lines));
+
+    let extraIndex = 0;
 
     lines.forEach((line, index) => {
         if (!line.trim().startsWith("#!")) {
@@ -77,8 +81,51 @@ export function parseFile(file, globals) {
                     )
                 );
             }
+            return;
+        }
+
+        // embedded command
+        if (!/<.+>/g.test(line)) {
+            console.error(
+                chalk.red(
+                    "Embedded command has no variables on line " +
+                        (index + 1) +
+                        " in file " +
+                        file
+                )
+            );
+            return;
+        }
+        const firstVariable = line.split("<")[1].split(">")[0];
+        const size =
+            variables[firstVariable]?.length ?? globals[firstVariable].length;
+        for (let i = 0; i < size; i++) {
+            let newLine = line;
+            const variablesToReplace = line.match(/<.+?>/g);
+            for (const variable of variablesToReplace) {
+                const variableName = variable.replace(/[<>]/g, "");
+                const value =
+                    variables[variableName]?.[i] ??
+                    globals[variableName]?.[i] ??
+                    variableName;
+                newLine = newLine
+                    .replace(variable, value)
+                    .replace(/#!/g, "")
+                    .trim();
+            }
+            // insert the new line
+            extraIndex++;
+            newLines.splice(index + extraIndex, 0, newLine);
         }
     });
+
+    // remove all prefunc lines
+    const filteredLines = newLines.filter(
+        (line) => !line.trim().startsWith("#!")
+    );
+
+    // write the new file to build dir
+    createFile(file.replace("~", ""), filteredLines.join("\n"));
 }
 
 /**
