@@ -7,7 +7,7 @@ import { parseGlobals, parseFile } from "./parser.js";
 import { Timer } from "./timer.js";
 
 const config = {
-    rootDir: "./data",
+    rootDir: "data",
     fileExtensions: ["mcfunction", "prefunc"],
 };
 
