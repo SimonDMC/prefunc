@@ -1,7 +1,16 @@
 import fs from "fs";
-import config from "./config.json" assert { type: "json" };
+import chalk from "chalk";
 import { getAllNestedFiles, wipeDirectory, copyFile } from "./fileUtils.js";
 import { parseGlobals, parseFile } from "./parser.js";
+import { Timer } from "./timer.js";
+
+const config = {
+    rootDir: "./data",
+    fileExtensions: ["mcfunction", "prefunc"],
+};
+
+// start timer
+const timer = new Timer();
 
 // get all folders in the root directory
 const directories = fs.readdirSync(config.rootDir);
@@ -46,3 +55,6 @@ directories.forEach((dir) => {
         parseFile(file, globals);
     });
 });
+
+// finish timer
+console.log(chalk.green("Build finished in " + timer.end + "ms"));
