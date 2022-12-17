@@ -112,10 +112,10 @@ You can then use a list in a command like this:
 
 ```
 #! def tools = wooden_sword, wooden_shovel, wooden_pickaxe, wooden_hoe, wooden_axe
-#! give @a <items>
+#! give @a <tools>
 ```
 
-where `<items>` will be replaced with all list items on seperate lines. This code would evaluate
+where `<tools>` will be replaced with all list items on seperate lines. This code would evaluate
 to the following:
 
 ```
