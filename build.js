@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import fs from "fs";
 import chalk from "chalk";
 import { getAllNestedFiles, wipeDirectory, copyFile } from "./fileUtils.js";
