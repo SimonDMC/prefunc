@@ -96,26 +96,38 @@ export function parseFile(file, globals) {
             );
             return;
         }
-        const firstVariable = line.split("<")[1].split(">")[0];
-        const size =
-            variables[firstVariable]?.length ?? globals[firstVariable].length;
-        for (let i = 0; i < size; i++) {
-            let newLine = line;
-            const variablesToReplace = line.match(/<.+?>/g);
-            for (const variable of variablesToReplace) {
-                const variableName = variable.replace(/[<>]/g, "");
-                const value =
-                    variables[variableName]?.[i] ??
-                    globals[variableName]?.[i] ??
-                    variableName;
-                newLine = newLine
-                    .replace(variable, value)
-                    .replace(/#!/g, "")
-                    .trim();
+        try {
+            const firstVariable = line.split("<")[1].split(">")[0];
+            const size =
+                variables[firstVariable]?.length ??
+                globals[firstVariable].length;
+            for (let i = 0; i < size; i++) {
+                let newLine = line;
+                const variablesToReplace = line.match(/<.+?>/g);
+                for (const variable of variablesToReplace) {
+                    const variableName = variable.replace(/[<>]/g, "");
+                    const value =
+                        variables[variableName]?.[i] ??
+                        globals[variableName]?.[i] ??
+                        variableName;
+                    newLine = newLine
+                        .replace(variable, value)
+                        .replace(/#!/g, "")
+                        .trim();
+                }
+                // insert the new line
+                extraIndex++;
+                newLines.splice(index + extraIndex, 0, newLine);
             }
-            // insert the new line
-            extraIndex++;
-            newLines.splice(index + extraIndex, 0, newLine);
+        } catch (e) {
+            console.error(
+                chalk.red(
+                    "Error parsing embedded command on line " +
+                        (index + 1) +
+                        " in file " +
+                        file
+                )
+            );
         }
     });
 

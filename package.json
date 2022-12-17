@@ -1,7 +1,7 @@
 {
     "name": "prefunc",
     "version": "1.0.0",
-    "description": "A Minecraft datapack preprocessor",
+    "description": "A Minecraft Datapack Preprocessor",
     "main": "build.js",
     "type": "module",
     "scripts": {
